@@ -25,7 +25,7 @@ SECRET_KEY = '5r-f&roahqwo))1pq8sc4*v=7w0p-t#77@)6ay+h+(8p28!jw^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['employees-demo-heroku.herokuapp.com']
 
 
 # Application definition
