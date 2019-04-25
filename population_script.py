@@ -5,7 +5,7 @@ import django
 django.setup()
 
 from faker import Faker
-from employee_search.models import Titles, Departments, Employees, Dept_Manager
+from employee_search.models import Titles, Departments, Employees
 import random
 
 def generate_emp(sal_min, sal_max, title_fk, dept_fk):
@@ -24,6 +24,14 @@ def generate_emp(sal_min, sal_max, title_fk, dept_fk):
                     title = Titles.objects.get(id=title_fk),
                     department = Departments.objects.get(id=dept_fk))
     emp.save()
+
+
+def assign_all_managers():
+    dept_count = Departments.objects.count()
+    manager_title_id = Titles.objects.filter(title="Manager").values('id')[0]['id']
+    for dept_id in range(1, dept_count + 1):
+        mgr_id = Employees.objects.filter(department_id=dept_id, title=manager_title_id).values('id')[0]['id']
+        Employees.objects.filter(department_id=dept_id).update(manager_id=mgr_id)
 
 
 Titles.objects.get_or_create(title='Manager')
@@ -104,3 +112,5 @@ for i in range(20):
     generate_emp(35000,40000,7,6)
 for i in range(30):
     generate_emp(25000,30000,8,6)
+
+assign_all_managers()

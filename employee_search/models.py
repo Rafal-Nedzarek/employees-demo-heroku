@@ -27,16 +27,10 @@ class Employees(models.Model):
                                  models.DO_NOTHING)
     department = models.ForeignKey(Departments,
                                       models.DO_NOTHING)
+    manager = models.ForeignKey('self',
+                                models.SET_NULL,
+                                null=True,)
+    # manager: related_name???
 
     class Meta:
         db_table = 'employees'
-
-
-class Dept_Manager(models.Model):
-    department = models.ForeignKey(Departments,
-                                      models.DO_NOTHING)
-    employee = models.ForeignKey(Employees,
-                                    models.DO_NOTHING)
-
-    class Meta:
-        db_table = 'dept_manager'
