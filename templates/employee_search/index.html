@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+{% extends "employee_search/base.html" %}
+    {% block form_block %}
+        {% load crispy_forms_tags %}
+        <div id="form-div" class="container">
+            <form method="POST">
+                <div class="row">
+                    <div class="col">
+                        {{ employees_form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ employees_form.last_name|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ employees_form.gender|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ employees_form.birth_date|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ employees_form.hire_date|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{ titles_form.title|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ employees_form.salary|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ departments_form.dept_name|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ dept_manager_form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="col">
+                        {{ dept_manager_form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        {% block results_table_block %}
+        {% endblock %}
+    {% endblock %}
