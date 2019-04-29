@@ -140,6 +140,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
+LOGIN_REDIRECT_URL = '/employees/'
+LOGOUT_REDIRECT_URL = '/employees/'
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())

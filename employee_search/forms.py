@@ -1,6 +1,7 @@
 from django import forms
 from django.core import validators
 from employee_search.models import Titles, Departments, Employees
+from django.contrib.auth.models import User
 
 
 class SearchEmployeesForm(forms.ModelForm):
@@ -58,3 +59,18 @@ class SearchDeptManagerForm(forms.Form):
         model = Employees
         fields = ['first_name',
                   'last_name']
+
+
+class RegisterUserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+    botcatcher = forms.CharField(required=False,
+                                 widget=forms.HiddenInput,
+                                 validators=[validators.MaxLengthValidator(0)])
+
+    class Meta:
+        model = User
+        fields = ['first_name',
+                  'last_name',
+                  'email',
+                  'username',
+                  'password']

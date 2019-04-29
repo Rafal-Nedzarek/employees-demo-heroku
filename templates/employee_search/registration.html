@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% extends "employee_search/base.html" %}
+    {% block form_block %}
+        {% load crispy_forms_tags %}
+        {% if registered %}
+        <div class="jumbotron">
+            <p>Thank you for registering!</p>
+        </div>
+        {% else %}
+        <div id="form-div" class="container">
+            <h1>Please register</h1>
+            <form method="POST">
+                {{ registration_form|crispy }}
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+        {% endif %}
+    {% endblock %}

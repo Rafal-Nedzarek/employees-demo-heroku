@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+{% extends "employee_search/base.html" %}
+    {% block form_block %}
+        {% load crispy_forms_tags %}
+        <div id="form-div" class="container">
+            <h1>Please login</h1>
+            <form method="POST">
+                {{ form|crispy }}
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    {% endblock %}

@@ -2,8 +2,10 @@ from django.shortcuts import render
 from employee_search.forms import (SearchEmployeesForm,
                                    SearchTitlesForm,
                                    SearchDepartmentsForm,
-                                   SearchDeptManagerForm)
+                                   SearchDeptManagerForm,
+                                   RegisterUserForm)
 from employee_search.models import Employees
+from django.contrib.auth.decorators import login_required
 
 all_query_filters = ""
 
@@ -33,7 +35,12 @@ def construct_query(search_model,
                    .order_by({order_by})"
     return eval(query_part_1 + query_part_2)
 
+def index_view(request):
+    return render(request,
+                  'employee_search/index.html',
+                  {})
 
+@login_required
 def query_form(request):
     global all_query_filters
     ROWS_LIMIT = 1000
@@ -103,7 +110,7 @@ def query_form(request):
                            'results': employees_queryset,
                            'limit_warning': limit_warning,
                            'results_count': results_count,
-                           'welcome_msg': welcome_msg, })
+                           'welcome_msg': welcome_msg})
         else:
             print('FORM INVALID')
     return render(request,
@@ -112,4 +119,23 @@ def query_form(request):
                    'titles_form': titles_form,
                    'departments_form': departments_form,
                    'dept_manager_form': dept_manager_form,
-                   'welcome_msg': welcome_msg, })
+                   'welcome_msg': welcome_msg})
+
+def registration(request):
+    registered = False
+    registration_form = RegisterUserForm()
+    if request.method == "POST":
+        registration_form = RegisterUserForm(request.POST)
+
+        if registration_form.is_valid():
+            new_user = registration_form.save()
+            new_user.set_password(new_user.password)
+            new_user.save()
+            registered = True
+        else:
+            print('FORM INVALID')
+        
+    return render(request,
+                  'employee_search/registration.html',
+                  {'registration_form': registration_form,
+                   'registered': registered})
