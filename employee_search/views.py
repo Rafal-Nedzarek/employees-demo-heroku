@@ -141,6 +141,7 @@ def registration(request):
                   {'registration_form': registration_form,
                    'registered': registered})
 
+@login_required
 def add_employee(request):
     add_employee_form = AddEmployeeForm()
     if request.method == "POST":
