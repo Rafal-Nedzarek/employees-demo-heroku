@@ -3,6 +3,7 @@ from employee_search.forms import (SearchEmployeesForm,
                                    SearchTitlesForm,
                                    SearchDepartmentsForm,
                                    SearchDeptManagerForm,
+                                   AddEmployeeForm,
                                    RegisterUserForm)
 from employee_search.models import Employees
 from django.contrib.auth.decorators import login_required
@@ -139,3 +140,15 @@ def registration(request):
                   'employee_search/registration.html',
                   {'registration_form': registration_form,
                    'registered': registered})
+
+def add_employee(request):
+    add_employee_form = AddEmployeeForm()
+    if request.method == "POST":
+        add_employee_form = AddEmployeeForm(request.POST)
+
+        if add_employee_form.is_valid():
+            new_employee = add_employee_form.save()
+            new_employee.save()
+        else:
+            print('FORM INVALID')
+    return render(request, 'employee_search/add-employee.html', {'add_employee_form': add_employee_form})

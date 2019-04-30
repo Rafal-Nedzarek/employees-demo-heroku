@@ -74,3 +74,19 @@ class RegisterUserForm(forms.ModelForm):
                   'email',
                   'username',
                   'password']
+
+
+class AddEmployeeForm(forms.ModelForm):
+    gender = forms.ChoiceField(choices=[("", ""),
+                                        ("F", "Female"),
+                                        ("M", "Male")])
+    manager = forms.ModelChoiceField(queryset=Employees.objects.filter(title_id=1))
+    botcatcher = forms.CharField(required=False,
+                                 widget=forms.HiddenInput,
+                                 validators=[validators.MaxLengthValidator(0)])
+
+    class Meta:
+        model = Employees
+        fields = '__all__'
+
+# USE MODELCHOICEFIELD INSTEAD OF TITLES AND DEPTS FORMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -9,12 +9,18 @@ class Titles(models.Model):
     class Meta:
         db_table = 'titles'
 
+    def __str__(self):
+        return self.title
+
 
 class Departments(models.Model):
     dept_name = models.CharField(max_length=50)
 
     class Meta:
         db_table = 'departments'
+
+    def __str__(self):
+        return self.dept_name
 
 
 class Employees(models.Model):
@@ -37,3 +43,7 @@ class Employees(models.Model):
 
     class Meta:
         db_table = 'employees'
+
+    def __str__(self):
+        full_name = ' '.join([self.first_name, self.last_name])
+        return full_name
