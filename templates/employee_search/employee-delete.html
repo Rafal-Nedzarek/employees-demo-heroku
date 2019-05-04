@@ -3,11 +3,10 @@
     {% block form_block %}
         {% load crispy_forms_tags %}
         <div id="form-div" class="container">
-            <h1>Please register</h1>
+            <h1>Delete {{ employee }}?</h1>
             <form method="POST">
-                {{ form|crispy }}
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="submit" class="btn btn-primary">Delete</button>
             </form>
         </div>
     {% endblock %}

@@ -3,9 +3,6 @@
     {% block results_table_block %}
         <div class="container">
             <div>
-                {% if limit_warning %}
-                <p>{{ limit_warning }}</p>
-                {% endif %}
                 <p>Entries retrieved: {{ results_count }}</p>
             </div>
             <div class="table-responsive-xl">
@@ -21,6 +18,7 @@
                         <th>Title</th>
                         <th>Department</th>
                         <th>Deptartment Manager</th>
+                        <th></th>
                     </thead>
                     {% for emp in results %}
                     <tr>
@@ -33,6 +31,7 @@
                         <td>{{ emp.title_id__title }}</td>
                         <td>{{ emp.department_id__dept_name }}</td>
                         <td>{{ emp.manager_id__first_name}} {{emp.manager_id__last_name }}</td>
+                        <td><a href="{{ emp.id }}">Edit</a></td>
                     </tr>
                     {% endfor %}
                 </table>

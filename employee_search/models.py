@@ -1,7 +1,10 @@
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
+# add contraints to rule out duplicate employees!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# make sure it does not break the population script - maybe update it!!!!!!!!
 
 class Titles(models.Model):
     title = models.CharField(max_length=50)
@@ -47,3 +50,6 @@ class Employees(models.Model):
     def __str__(self):
         full_name = ' '.join([self.first_name, self.last_name])
         return full_name
+    
+    def get_absolute_url(self):
+        return reverse('employee_search:emp_details', kwargs={'pk': self.pk})

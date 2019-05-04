@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% extends "employee_search/base.html" %}
+    {% block form_block %}
+        {% load crispy_forms_tags %}
+        <div id="form-div" class="container">
+            <h1>Employee details</h1>
+            <div class="table-responsive-xl">
+                {% if emp_details %}
+                <table class="table table-hover">  
+                    <thead>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Gender</th>
+                        <th>Birth Date</th>
+                        <th>Hire Date</th>
+                        <th>Salary</th>
+                    </thead>
+                    <tr>
+                        <td>{{ emp_details.first_name }}</td>
+                        <td>{{ emp_details.last_name }}</td>
+                        <td>{{ emp_details.gender }}</td>
+                        <td>{{ emp_details.birth_date }}</td>
+                        <td>{{ emp_details.hire_date }}</td>
+                        <td>{{ emp_details.salary }}</td>
+                    </tr>
+                </table>
+                {% else %}
+                <div class="jumbotron">
+                    <p>No matching records found.</p>
+                </div>
+                {% endif %}
+            </div>
+            <a class="btn btn-primary" href="{% url 'employee_search:emp_update' pk=emp_details.id %}" role="button">Update</a>
+            <a class="btn btn-primary" href="{% url 'employee_search:emp_delete' pk=emp_details.id %}" role="button">Delete</a>
+        </div>
+    {% endblock %}
