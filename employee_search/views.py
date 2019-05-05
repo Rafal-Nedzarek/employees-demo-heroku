@@ -1,13 +1,18 @@
 from django.shortcuts import render
+from employee_search.models import Employees
 from employee_search.forms import (SearchEmployeesForm,
                                    SearchTitlesForm,
                                    SearchDepartmentsForm,
                                    SearchDeptManagerForm,
                                    AddEmployeeForm,
                                    RegisterUserForm)
-from employee_search.models import Employees
+from django.views.generic import (TemplateView,
+                                  ListView,
+                                  CreateView,
+                                  DetailView,
+                                  UpdateView,
+                                  DeleteView)
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
@@ -19,12 +24,15 @@ def get_form_filters(search_form,
     used by the construct_query function. Adds a rel_prefix for keys
     from models related to the main model, e.g. \'title_id__\'.
     '''
+    query_filters = ""
     for key, val in search_form.cleaned_data.items():
         if val is not None and str(val) != "":
             if not (isinstance(val, int) or isinstance(val, float)):
                 val = "'" + str(val) + "'"
-            return f"{rel_prefix}{key}={val}, "
-        return ""
+                query_filters += f"{rel_prefix}{key}__iexact={val}, "
+            else:
+                query_filters += f"{rel_prefix}{key}={val}, "
+    return query_filters
 
 
 def construct_query(search_model,
@@ -36,12 +44,10 @@ def construct_query(search_model,
     putting form_filters into the filter() method
     and display_vals into the values() method. Orders data by order_by.
     '''
-    # test modifying the query with select_related!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    # does the query need to be divided into parts???????????????????????????????????????????
-    query_part_1 = f"{search_model}.objects.filter("
-    query_part_2 = f"{form_filters}).values({display_vals})\
-                   .order_by({order_by})"
-    return eval(query_part_1 + query_part_2)
+    # TODO: use select_related? check len(connection.queries)
+    query_string = f"{search_model}.objects.filter({form_filters})\
+                   .values({display_vals}).order_by({order_by})"
+    return eval(query_string)
 
 
 class IndexView(TemplateView):
@@ -57,29 +63,30 @@ class RegistrationView(CreateView):
         user = form.save()
         user.set_password(user.password)
         user.save()
+        # TODO: double-check if this return is correct
         return super().form_valid(form)
-    # check if that return makes sense!!!!!!!!!!!!!!!!!!!!!
-    # get_context_data to override context name 'form' for template
+    # TODO: get_context_data to override context name 'form'?
 
 
 class AddEmployeeView(LoginRequiredMixin, CreateView):
     form_class = AddEmployeeForm
     success_url = reverse_lazy('employee_search:query_form')
-    template_name = 'employee_search/add-employee.html'
-    # get_context_data to override context name 'form' for template
+    template_name = 'employee_search/employee-add.html'
+    # TODO: get_context_data to override context name 'form'?
 
 
 class EmployeeDetailsView(LoginRequiredMixin, DetailView):
     model = Employees
     context_object_name = 'emp_details'
     template_name = 'employee_search/employee-details.html'
-    # add related fields, maybe a query with select_related???
+    # TODO: add related fields; maybe a query with select_related?
 
 
 class EmployeeUpdateView(LoginRequiredMixin, UpdateView):
     model = Employees
     form_class = AddEmployeeForm
     template_name = 'employee_search/employee-update.html'
+    # TODO: get_context_data to override context name 'form'?
 
 
 class EmployeeDeleteView(DeleteView):
@@ -87,6 +94,7 @@ class EmployeeDeleteView(DeleteView):
     context_object_name = 'employee'
     success_url = reverse_lazy('employee_search:query_form')
     template_name = 'employee_search/employee-delete.html'
+
 
 @login_required
 def query_form(request):
@@ -108,10 +116,9 @@ def query_form(request):
            titles_form.is_valid() and \
            departments_form.is_valid() and \
            dept_manager_form.is_valid():
-
             # get data from forms and append the all_query_filters
             all_query_filters = get_form_filters(employees_form,
-                                                  '')
+                                                 '')
             all_query_filters += get_form_filters(titles_form,
                                                   'title_id__')
             all_query_filters += get_form_filters(departments_form,

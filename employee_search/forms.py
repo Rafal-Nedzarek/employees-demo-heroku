@@ -3,8 +3,11 @@ from django.core import validators
 from employee_search.models import Titles, Departments, Employees
 from django.contrib.auth.models import User
 
+# TODO: add choice b/w iexact and icontains
+
 
 class SearchEmployeesForm(forms.ModelForm):
+    # TODO: use ModelChoiceField for title and department?
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
     gender = forms.ChoiceField(choices=[("", ""),
@@ -31,25 +34,26 @@ class SearchEmployeesForm(forms.ModelForm):
                   'salary']
 
 
-# NEED CONSTRAINT UNIQUE?????????????????????????????????????????????
 class SearchTitlesForm(forms.ModelForm):
-    title = forms.CharField(required=False)
+    title = forms.ModelChoiceField(queryset=Titles.objects.all(),
+                                   required=False)
 
     class Meta:
         model = Titles
         fields = ['title']
 
 
-# STILL NEED CONSTRAINT UNIQUE???????????????????????????????????????
-# can't search by name because of the model's unique=True clause
-# using Form instead of ModelForm as a workaround
-class SearchDepartmentsForm(forms.Form):
-    dept_name = forms.CharField(required=False,
-                                label="Department name",
-                                validators=[validators.MaxLengthValidator(50)])
+class SearchDepartmentsForm(forms.ModelForm):
+    dept_name = forms.ModelChoiceField(queryset=Departments.objects.all(),
+                                       required=False,
+                                       label="Department")
+
+    class Meta:
+        model = Departments
+        fields = ['dept_name']
 
 
-class SearchDeptManagerForm(forms.Form):
+class SearchDeptManagerForm(forms.ModelForm):
     first_name = forms.CharField(required=False,
                                  label="Manager's first name")
     last_name = forms.CharField(required=False,
@@ -80,7 +84,8 @@ class AddEmployeeForm(forms.ModelForm):
     gender = forms.ChoiceField(choices=[("", ""),
                                         ("F", "Female"),
                                         ("M", "Male")])
-    manager = forms.ModelChoiceField(queryset=Employees.objects.filter(title_id=1))
+    manager = forms.ModelChoiceField(queryset=Employees.objects
+                                     .filter(title_id=1))
     botcatcher = forms.CharField(required=False,
                                  widget=forms.HiddenInput,
                                  validators=[validators.MaxLengthValidator(0)])
@@ -88,5 +93,3 @@ class AddEmployeeForm(forms.ModelForm):
     class Meta:
         model = Employees
         fields = '__all__'
-
-# USE MODELCHOICEFIELD INSTEAD OF TITLES AND DEPTS FORMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!
