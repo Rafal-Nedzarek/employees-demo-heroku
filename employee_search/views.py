@@ -17,39 +17,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
 
-def get_form_filters(search_form,
-                     rel_prefix):
-    '''
-    Gets cleaned data from a search_form and adds it to the filter list
-    used by the construct_query function. Adds a rel_prefix for keys
-    from models related to the main model, e.g. \'title_id__\'.
-    '''
-    query_filters = ""
-    for key, val in search_form.cleaned_data.items():
-        if val is not None and str(val) != "":
-            if not (isinstance(val, int) or isinstance(val, float)):
-                val = "'" + str(val) + "'"
-                query_filters += f"{rel_prefix}{key}__iexact={val}, "
-            else:
-                query_filters += f"{rel_prefix}{key}={val}, "
-    return query_filters
-
-
-def construct_query(search_model,
-                    form_filters,
-                    display_vals,
-                    order_by):
-    '''
-    Constructs and runs a query of the search_model,
-    putting form_filters into the filter() method
-    and display_vals into the values() method. Orders data by order_by.
-    '''
-    # TODO: use select_related? check len(connection.queries)
-    query_string = f"{search_model}.objects.filter({form_filters})\
-                   .values({display_vals}).order_by({order_by})"
-    return eval(query_string)
-
-
 class IndexView(TemplateView):
     template_name = 'employee_search/index.html'
 
@@ -116,34 +83,44 @@ def query_form(request):
            titles_form.is_valid() and \
            departments_form.is_valid() and \
            dept_manager_form.is_valid():
-            # get data from forms and append the all_query_filters
-            all_query_filters = get_form_filters(employees_form,
-                                                 '')
-            all_query_filters += get_form_filters(titles_form,
-                                                  'title_id__')
-            all_query_filters += get_form_filters(departments_form,
-                                                  'department_id__')
-            all_query_filters += get_form_filters(dept_manager_form,
-                                                  'manager_id__')
 
-            # provide values to be displayed
-            all_display_vals = "'id',\
-                                'first_name',\
-                                'last_name',\
-                                'gender',\
-                                'birth_date',\
-                                'hire_date',\
-                                'salary',\
-                                'title_id__title',\
-                                'department_id__dept_name',\
-                                'manager_id__first_name',\
-                                'manager_id__last_name'"
+            # ignored line lenght limit for readability (lines 91-104)
+            # TODO: prioritize Django style over PEP8, apply to all files
+            # TODO: maybe loop through cleaned forms to create this dict?
+            test_filters = {
+                'first_name__iexact': employees_form.cleaned_data.get('first_name'),
+                'last_name__iexact': employees_form.cleaned_data.get('last_name'),
+                'gender': employees_form.cleaned_data.get('gender'),
+                'birth_date': employees_form.cleaned_data.get('birth_date'),
+                'hire_date': employees_form.cleaned_data.get('hire_date'),
+                'salary': employees_form.cleaned_data.get('salary'),
+                'title_id__title': titles_form.cleaned_data.get('title'),
+                'department_id__dept_name': departments_form.cleaned_data.get('dept_name'),
+                'manager_id__first_name__iexact': dept_manager_form.cleaned_data.get('first_name'),
+                'manager_id__last_name__iexact': dept_manager_form.cleaned_data.get('last_name')
+            }
 
-            # query the DB
-            employees_queryset = construct_query('Employees',
-                                                 all_query_filters,
-                                                 all_display_vals,
-                                                 "'first_name', 'last_name'")
+            # exclude empty form fields
+            test_filters_used = {key: val for key, val in test_filters.items() if val}
+
+            # query the database
+            employees_queryset = Employees.objects \
+                .filter(**test_filters_used) \
+                .values(
+                    'id',
+                    'first_name',
+                    'last_name',
+                    'gender',
+                    'birth_date',
+                    'hire_date',
+                    'salary',
+                    'title_id__title',
+                    'department_id__dept_name',
+                    'manager_id__first_name',
+                    'manager_id__last_name') \
+                .order_by('first_name',
+                          'last_name')
+
             results_count = employees_queryset.count()
 
             return render(request,
